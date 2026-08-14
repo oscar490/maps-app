@@ -26,7 +26,11 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/maplibre-gl/dist/maplibre-gl.css"
+            ],
+            "scripts": [
+              "node_modules/maplibre-gl/dist/maplibre-gl.mjs"
             ]
           },
           "configurations": {
