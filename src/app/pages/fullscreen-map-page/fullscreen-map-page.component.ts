@@ -1,4 +1,4 @@
-import { DecimalPipe } from "@angular/common";
+import { DecimalPipe, JsonPipe } from "@angular/common";
 import { AfterViewInit, Component, effect, ElementRef, OnInit, signal, ViewChild, viewChild } from "@angular/core";
 
 
@@ -8,7 +8,7 @@ declare const maplibregl: any;
 @Component({
   selector: 'fullscreen',
   templateUrl: './fullscreen-map-page.component.html',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, JsonPipe],
   styles: `
     div {
       widht: 100vw;
@@ -35,6 +35,10 @@ export class FullScreenMapPageComponent implements AfterViewInit {
 
   map!: any;
   zoom = signal(14);
+  coordinates = signal({
+    lng: -6.3539, 
+    lat: 36.7789
+  })
 
   zoomEffect = effect(() => {
     const zoom = this.zoom();
@@ -46,10 +50,12 @@ export class FullScreenMapPageComponent implements AfterViewInit {
       return;
     }
 
+    const {lat, lng} = this.coordinates();
+
     const map = new maplibregl.Map({
       container: this.mapContainer?.nativeElement,
       style: 'https://tiles.openfreemap.org/styles/liberty', 
-      center: [-6.3539, 36.7789], // Madrid, España [Longitud, Latitud]
+      center: [lng, lat], // Madrid, España [Longitud, Latitud]
       zoom: this.zoom()
     });
 
@@ -61,6 +67,11 @@ export class FullScreenMapPageComponent implements AfterViewInit {
     map.on('zoomend', (event: any) => {
       const newZoom = event.target.getZoom();
       this.zoom.set(newZoom);
+    })
+
+    map.on('moveend', (event: any) => {
+      const center = map.getCenter();
+      this.coordinates.set(center);
     })
 
     this.map = map;
